@@ -48,6 +48,3 @@ The CAN examples include local topology files and test cases. Cloud execution
 needs a TrueFidelity account and access to the runtime images named in those
 files. The checked-in tests currently use development runtime images. Select
 images accepted by your environment before running them.
-
-The previous repository and its history are preserved at
-[tf-demo_old](https://github.com/NebulaTechSolutions/tf-demo_old).
