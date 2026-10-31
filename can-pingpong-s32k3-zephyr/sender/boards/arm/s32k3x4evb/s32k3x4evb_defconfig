@@ -1,0 +1,27 @@
+# Copyright 2023-2024 NXP
+# SPDX-License-Identifier: Apache-2.0
+
+CONFIG_BUILD_OUTPUT_HEX=y
+
+# Use Systick as system clock
+CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC=160000000
+
+# Run from internal Flash
+CONFIG_XIP=y
+
+# MPU disabled for virtual ECU (causes compilation issues)
+# CONFIG_ARM_MPU is not set
+
+# Use no-cached memory for HAL (not supported in current Zephyr)
+# CONFIG_NOCACHE_MEMORY=y
+
+# Drivers
+CONFIG_SERIAL=y
+# Watchdog disabled for virtual ECU
+# CONFIG_WATCHDOG is not set
+
+# Serial console
+CONFIG_CONSOLE=y
+
+# CAN bus support for virtual ECU
+CONFIG_CAN=y

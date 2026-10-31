@@ -1,0 +1,59 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: Test
+metadata:
+  name: C++ firmware rejects malformed PING and replies through the gateway
+spec:
+  requires:
+    ecus: [gateway, cpp-responder]
+    capabilities: [can.capture, can.inject, logs.capture]
+  clock: {mode: simulation, maxUncertainty: 0ns, maxSchedulingDelay: 0ns}
+  timeout: 100ms
+  bindings:
+    request: {kind: canFrame, bus: vehicle, frameId: 293, extended: false, observation: bus}
+    firmwareReply: {kind: canFrame, bus: internal, frameId: 294, extended: false, observation: {ecu: cpp-responder, direction: tx}}
+    response: {kind: canFrame, bus: vehicle, frameId: 294, extended: false, observation: {ecu: gateway, direction: tx}}
+  setup:
+    - id: firmware-ready
+      expect:
+        logs: {ecu: cpp-responder, contains: "C++ responder ready"}
+        mode: eventually
+        within: 10ms
+  steps:
+    - id: bad-header
+      send: {binding: request, data: [78, 79, 80, 69, 1, 2, 3, 4]}
+    - id: reject-header
+      expect:
+        binding: firmwareReply
+        mode: never
+        for: 10ms
+        predicate: {dataMaskedEquals: {value: [0, 0, 0, 0, 0, 0, 0, 0], mask: [0, 0, 0, 0, 0, 0, 0, 0]}}
+    - id: short-ping
+      send: {binding: request, data: [80, 73, 78, 71]}
+    - id: reject-short-payload
+      expect:
+        binding: firmwareReply
+        mode: never
+        for: 10ms
+        predicate: {dataMaskedEquals: {value: [0, 0, 0, 0, 0, 0, 0, 0], mask: [0, 0, 0, 0, 0, 0, 0, 0]}}
+    - id: send-ping
+      send: {binding: request, data: [80, 73, 78, 71, 1, 2, 3, 4]}
+    - id: firmware-replied
+      expect:
+        binding: firmwareReply
+        mode: eventually
+        within: 20ms
+        predicate: {dataEquals: [67, 80, 80, 33, 1, 2, 3, 4]}
+    - id: gateway-returned-reply
+      expect:
+        binding: response
+        mode: eventually
+        within: 20ms
+        predicate: {dataEquals: [67, 80, 80, 33, 1, 2, 3, 4]}
+    - id: send-another-ping
+      send: {binding: request, data: [80, 73, 78, 71, 255, 0, 128, 42]}
+    - id: mailbox-rearmed
+      expect:
+        binding: response
+        mode: eventually
+        within: 20ms
+        predicate: {dataEquals: [67, 80, 80, 33, 255, 0, 128, 42]}

@@ -1,0 +1,22 @@
+apiVersion: truefidelity.dev/v1
+kind: Topology
+metadata:
+  name: pingpong-receiver
+spec:
+  ecus:
+    - id: receiver
+      name: Zephyr receiver
+      image: harbor.nebula-platform.dev/truefidelity/test-runtime-ecu@sha256:785dc2ac82f9646a68c0a0fce320d969a66ab61cf1e9b1b3115fd0f7a0f831be
+      board: s32k3x4evb
+      os: zephyr
+      ecu_type: firmware
+      cpu_cores: 1
+      memory_mb: 256
+      firmware: artifacts/receiver.elf
+      connected_buses: [can]
+  canBuses:
+    - id: can
+      name: Ping-pong CAN
+      bitrate: 500000
+      canFd: false
+      dbc_file: pingpong.dbc

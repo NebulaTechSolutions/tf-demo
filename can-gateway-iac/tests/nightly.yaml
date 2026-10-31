@@ -1,0 +1,23 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: TestSuite
+metadata:
+  name: CAN gateway nightly
+spec:
+  topologies:
+    gateway: ../topology.yaml
+  execution:
+    maxParallel: 1
+    failFast: true
+    speed: fastest
+    seed: 42
+  outputs:
+    reports: [json, junit, html]
+    testLogs: true
+    environmentLogs: true
+    traffic: {default: false, buses: {vehicle: true, internal: true}}
+    assertionEvidence: true
+    portalSummary: true
+  cases:
+    - {id: echo, topology: gateway, test: echo.yaml, environment: fresh}
+    - {id: reject, topology: gateway, test: reject.yaml, environment: fresh}
+    - {id: cpp, topology: gateway, test: cpp.yaml, environment: fresh}

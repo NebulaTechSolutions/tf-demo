@@ -1,0 +1,42 @@
+apiVersion: truefidelity.dev/v1
+kind: Topology
+metadata:
+  name: CAN gateway demo
+spec:
+  ecus:
+    - id: gateway
+      name: Gateway
+      ecu_type: script
+      image: harbor.nebula-platform.dev/truefidelity/test-runtime-python@sha256:785dc2ac82f9646a68c0a0fce320d969a66ab61cf1e9b1b3115fd0f7a0f831be
+      cpu_cores: 1
+      memory_mb: 256
+      firmware: build/ecus.zip
+      entrypoint: gateway.py
+      connected_buses: [vehicle, internal]
+    - id: receiver
+      name: Receiver
+      ecu_type: script
+      image: harbor.nebula-platform.dev/truefidelity/test-runtime-python@sha256:785dc2ac82f9646a68c0a0fce320d969a66ab61cf1e9b1b3115fd0f7a0f831be
+      cpu_cores: 1
+      memory_mb: 256
+      firmware: build/ecus.zip
+      entrypoint: receiver.py
+      connected_buses: [internal]
+    - id: cpp-responder
+      name: C++ responder
+      ecu_type: firmware
+      board: s32k3x4evb
+      image: harbor.nebula-platform.dev/truefidelity/test-runtime-ecu@sha256:785dc2ac82f9646a68c0a0fce320d969a66ab61cf1e9b1b3115fd0f7a0f831be
+      cpu_cores: 1
+      memory_mb: 256
+      firmware: build/cpp-responder.elf
+      connected_buses: [internal]
+  canBuses:
+    - id: vehicle
+      name: Vehicle CAN
+      bitrate: 500000
+      canFd: false
+    - id: internal
+      name: Internal CAN
+      bitrate: 500000
+      canFd: false

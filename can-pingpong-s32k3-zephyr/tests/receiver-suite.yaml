@@ -1,0 +1,26 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: TestSuite
+metadata:
+  name: Ping-pong receiver inputs
+spec:
+  topologies:
+    receiver: topology-receiver.yaml
+  execution:
+    maxParallel: 1
+    failFast: true
+    speed: fastest
+    seed: 42
+  outputs:
+    reports: [json, junit, html]
+    testLogs: true
+    environmentLogs: true
+    traffic:
+      default: false
+      buses: {can: false}
+    assertionEvidence: true
+    portalSummary: true
+  cases:
+    - id: receiver-inputs
+      topology: receiver
+      test: receiver-inputs.yaml
+      environment: fresh

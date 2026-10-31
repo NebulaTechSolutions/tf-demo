@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="260" viewBox="0 0 820 260" role="img" aria-labelledby="title desc">
+  <title id="title">Ping-pong test topologies</title>
+  <desc id="desc">The Zephyr sender and receiver share a 500 kilobit CAN bus. The mixed topology adds a Python receiver. Receiver-only tests replace the sender with test-runner injection.</desc>
+  <rect width="820" height="260" rx="16" fill="#101b2d"/>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g fill="#1d304b" stroke="#7c9cbd" stroke-width="2">
+      <rect x="30" y="28" width="220" height="100" rx="10"/>
+      <rect x="300" y="28" width="220" height="100" rx="10"/>
+      <rect x="570" y="28" width="220" height="100" rx="10" stroke-dasharray="6 4"/>
+    </g>
+    <g fill="#f0f5ff" font-size="18">
+      <text x="140" y="59">Zephyr sender</text>
+      <text x="410" y="59">Zephyr receiver</text>
+      <text x="680" y="59">Python receiver</text>
+    </g>
+    <g fill="#b8c9df" font-size="15">
+      <text x="140" y="88">PING · 0x123</text>
+      <text x="410" y="88">PONG · 0x124</text>
+      <text x="680" y="88">PONG2 · 0x125</text>
+      <text x="140" y="112">S32K344 · FlexCAN0</text>
+      <text x="410" y="112">S32K344 · FlexCAN0</text>
+      <text x="680" y="112">Mixed suite only · can0</text>
+    </g>
+    <path d="M140 128V174M410 128V174M680 128V174M65 174H755" fill="none" stroke="#51d0be" stroke-width="4"/>
+    <text x="410" y="204" fill="#79e4d3" font-size="17">CAN · 500 kbit/s · Classical frames</text>
+    <text x="410" y="238" fill="#b8c9df" font-size="14">Receiver-only suite: the test runner sends PING instead of the sender ECU.</text>
+  </g>
+</svg>

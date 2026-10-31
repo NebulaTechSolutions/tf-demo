@@ -1,0 +1,8 @@
+/artifacts/
+/sources/
+/pingpong.dbc
+/preparation.json
+/.prepared*/
+/tf-results/
+/results*/
+__pycache__/

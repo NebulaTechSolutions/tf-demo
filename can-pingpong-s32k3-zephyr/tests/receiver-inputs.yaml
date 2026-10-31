@@ -1,0 +1,64 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: Test
+metadata:
+  name: Receiver accepts valid PING and rejects malformed input
+spec:
+  requires:
+    ecus: [receiver]
+    capabilities: [can.capture, can.inject, logs.capture]
+  clock:
+    mode: simulation
+    maxUncertainty: 0ns
+    maxSchedulingDelay: 0ns
+  timeout: 1s
+  bindings:
+    ping: {kind: canFrame, bus: can, frameId: 291, extended: false, observation: bus}
+    wrongId: {kind: canFrame, bus: can, frameId: 290, extended: false, observation: bus}
+    pong: {kind: canFrame, bus: can, frameId: 292, extended: false, observation: {ecu: receiver, direction: tx}}
+  setup:
+    - id: ready
+      expect:
+        logs: {ecu: receiver, contains: "CAN ready, waiting for PING messages..."}
+        mode: eventually
+        within: 100ms
+  steps:
+    - id: bad-header
+      send: {binding: ping, data: [78, 79, 80, 69, 7, 50, 0, 0]}
+    - id: bad-header-is-ignored
+      expect:
+        binding: pong
+        mode: never
+        for: 20ms
+        predicate: {dataMaskedEquals: {value: [0, 0, 0, 0, 0, 0, 0, 0], mask: [0, 0, 0, 0, 0, 0, 0, 0]}}
+    - id: short-ping
+      send: {binding: ping, data: [80, 73, 78, 71, 8, 50, 0]}
+    - id: short-ping-is-ignored
+      expect:
+        binding: pong
+        mode: never
+        for: 20ms
+        predicate: {dataMaskedEquals: {value: [0, 0, 0, 0, 0, 0, 0, 0], mask: [0, 0, 0, 0, 0, 0, 0, 0]}}
+    - id: wrong-identifier
+      send: {binding: wrongId, data: [80, 73, 78, 71, 9, 50, 0, 0]}
+    - id: wrong-identifier-is-ignored
+      expect:
+        binding: pong
+        mode: never
+        for: 20ms
+        predicate: {dataMaskedEquals: {value: [0, 0, 0, 0, 0, 0, 0, 0], mask: [0, 0, 0, 0, 0, 0, 0, 0]}}
+    - id: valid-zero
+      send: {binding: ping, data: [80, 73, 78, 71, 0, 50, 0, 0]}
+    - id: zero-is-echoed
+      expect:
+        binding: pong
+        mode: eventually
+        within: 50ms
+        predicate: {dataMaskedEquals: {value: [80, 79, 78, 71, 0, 0, 0, 0], mask: [255, 255, 255, 255, 255, 0, 0, 0]}}
+    - id: valid-255
+      send: {binding: ping, data: [80, 73, 78, 71, 255, 100, 0, 0]}
+    - id: maximum-counter-is-echoed
+      expect:
+        binding: pong
+        mode: eventually
+        within: 50ms
+        predicate: {dataMaskedEquals: {value: [80, 79, 78, 71, 255, 0, 0, 0], mask: [255, 255, 255, 255, 255, 0, 0, 0]}}

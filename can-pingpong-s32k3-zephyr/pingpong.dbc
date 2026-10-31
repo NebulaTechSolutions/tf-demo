@@ -1,0 +1,41 @@
+VERSION ""
+
+NS_ :
+
+BS_:
+
+BU_: ECU1 ECU2 ECU3
+
+BO_ 291 PING_Message: 8 ECU1
+ SG_ SequenceCounter : 32|8@1+ (1,0) [0|255] "count" ECU2,ECU3
+ SG_ SignalStrength : 40|8@1+ (1,0) [0|100] "%" ECU2,ECU3
+ SG_ TimestampOffset : 48|16@1+ (1,0) [0|65535] "ms" ECU2,ECU3
+
+BO_ 292 PONG_Response: 8 ECU2
+ SG_ EchoCounter : 32|8@1+ (1,0) [0|255] "count" ECU1
+ SG_ ProcessingTime : 40|8@1+ (1,0) [0|255] "ms" ECU1
+ SG_ RoundTripTime : 48|16@1+ (1,0) [0|65535] "ms" ECU1
+
+BO_ 293 PONG2_Response: 8 ECU3
+ SG_ EchoCounter : 32|8@1+ (1,0) [0|255] "count" ECU1
+ SG_ ProcessingTime : 40|8@1+ (1,0) [0|255] "ms" ECU1
+ SG_ RoundTripTime : 48|16@1+ (1,0) [0|65535] "ms" ECU1
+
+CM_ BO_ 291 "PING test message from ECU1";
+CM_ BO_ 292 "PONG response from ECU2 (Zephyr firmware)";
+CM_ BO_ 293 "PONG response from ECU3 (Python script). Same payload layout as PONG_Response on a separate ID — two ECUs cannot share a CAN arbitration ID.";
+CM_ SG_ 291 SequenceCounter "Incremental counter for message sequencing";
+CM_ SG_ 291 SignalStrength "Simulated signal strength percentage";
+CM_ SG_ 291 TimestampOffset "Timestamp offset from start in milliseconds";
+CM_ SG_ 292 EchoCounter "Echo of the received sequence counter";
+CM_ SG_ 292 ProcessingTime "Time taken to process the ping message";
+CM_ SG_ 292 RoundTripTime "Total round trip time measurement";
+CM_ SG_ 293 EchoCounter "Echo of the received sequence counter (Python receiver)";
+CM_ SG_ 293 ProcessingTime "Time taken to process the ping message (Python receiver)";
+CM_ SG_ 293 RoundTripTime "Total round trip time measurement (Python receiver)";
+
+BA_DEF_ BO_ "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_DEF_ "GenMsgCycleTime" 0;
+BA_ "GenMsgCycleTime" BO_ 291 100;
+BA_ "GenMsgCycleTime" BO_ 292 0;
+BA_ "GenMsgCycleTime" BO_ 293 0;

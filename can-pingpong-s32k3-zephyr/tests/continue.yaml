@@ -1,0 +1,50 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: Test
+metadata:
+  name: Firmware exchange 2
+spec:
+  requires:
+    ecus: [sender, receiver]
+    capabilities: [can.capture]
+  clock:
+    mode: simulation
+    maxUncertainty: 0ns
+    maxSchedulingDelay: 0ns
+  timeout: 2s
+  python:
+    bundle: artifacts/python.tar.gz
+    runnerImage: harbor.nebula-platform.dev/truefidelity/test-runtime-python@sha256:785dc2ac82f9646a68c0a0fce320d969a66ab61cf1e9b1b3115fd0f7a0f831be
+    modules: [checks]
+  bindings:
+    ping: {kind: canFrame, bus: can, frameId: 291, extended: false, observation: {ecu: sender, direction: tx}}
+    pong: {kind: canFrame, bus: can, frameId: 292, extended: false, observation: {ecu: receiver, direction: tx}}
+  steps:
+    - id: exchange
+      parallel:
+        - id: ping
+          steps:
+            - id: ping-counter
+              expect:
+                binding: ping
+                mode: eventually
+                within: 1800ms
+                predicate:
+                  dataMaskedEquals:
+                    value: [80, 73, 78, 71, 2, 52, 0, 0]
+                    mask: [255, 255, 255, 255, 255, 255, 0, 0]
+        - id: pong
+          steps:
+            - id: pong-counter
+              expect:
+                binding: pong
+                mode: eventually
+                within: 1800ms
+                predicate:
+                  dataMaskedEquals:
+                    value: [80, 79, 78, 71, 2, 0, 0, 0]
+                    mask: [255, 255, 255, 255, 255, 0, 0, 0]
+    - id: clock-and-fixture
+      python:
+        module: checks
+        function: verify_environment
+        inputs: {minimum_ns: 2000000000, maximum_ns: 3600000000}

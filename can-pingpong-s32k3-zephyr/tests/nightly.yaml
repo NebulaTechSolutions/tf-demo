@@ -1,0 +1,39 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: TestSuite
+metadata:
+  name: Ping-pong nightly
+spec:
+  topologies:
+    receiver: topology-receiver.yaml
+    pair: topology-firmware.yaml
+  execution:
+    maxParallel: 1
+    failFast: true
+    speed: fastest
+    seed: 42
+  outputs:
+    reports: [json, junit, html]
+    testLogs: true
+    environmentLogs: true
+    traffic:
+      default: false
+      buses: {can: false}
+    assertionEvidence: true
+    portalSummary: true
+  cases:
+    - id: receiver-inputs
+      topology: receiver
+      test: receiver-inputs.yaml
+      environment: fresh
+    - id: pair-fresh
+      topology: pair
+      test: exchange.yaml
+      environment: fresh
+    - id: pair-continued
+      topology: pair
+      test: continue.yaml
+      environment: continue
+    - id: pair-reset
+      topology: pair
+      test: exchange.yaml
+      environment: fresh

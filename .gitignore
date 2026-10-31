@@ -1,0 +1,10 @@
+**/build/
+__pycache__/
+*.pyc
+*.cpio.gz
+.local/
+TASKS.md
+.DS_Store
+**/tests/artifacts/
+**/tests/results/
+**/tests/preparation.json

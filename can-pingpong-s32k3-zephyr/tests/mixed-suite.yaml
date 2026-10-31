@@ -1,0 +1,26 @@
+apiVersion: truefidelity.dev/v1alpha1
+kind: TestSuite
+metadata:
+  name: Ping-pong firmware and Python
+spec:
+  topologies:
+    mixed: topology-mixed.yaml
+  execution:
+    maxParallel: 1
+    failFast: true
+    speed: fastest
+    seed: 42
+  outputs:
+    reports: [json, junit, html]
+    testLogs: true
+    environmentLogs: true
+    traffic:
+      default: false
+      buses: {can: true}
+    assertionEvidence: true
+    portalSummary: true
+  cases:
+    - id: mixed-exchange
+      topology: mixed
+      test: mixed-exchange.yaml
+      environment: fresh

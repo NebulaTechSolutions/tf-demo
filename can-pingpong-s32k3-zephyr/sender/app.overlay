@@ -1,0 +1,13 @@
+/ {
+    chosen {
+        zephyr,can-primary = &flexcan0;
+    };
+};
+
+&flexcan0 {
+    status = "okay";
+    bus-speed = <500000>;
+    bus-speed-data = <500000>;
+    sample-point = <875>;
+    sample-point-data = <875>;
+};
